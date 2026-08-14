@@ -2,6 +2,12 @@ package com.example.vixlegenverso10.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+
+val BordoEscuro = Color(0xFF4A1819)
+val BordoPrincipal = Color(0xFF6B2A2B)
+val BordoClaro = Color(0xFF8B3A3C)
+val FundoBranco = Color(0xFFFAFAFA)
+
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)
 val Pink80 = Color(0xFFEFB8C8)

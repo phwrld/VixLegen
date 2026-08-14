@@ -26,19 +26,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             VixLegenVersão10Theme {
-                var isLoading by remember { mutableStateOf(true
-                ) }
+                var isLoading by remember { mutableStateOf(true) }
+
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     if (isLoading) {
-                        SplashScreen  (onTimeOut = {isLoading = false })
+                        SplashScreen(onTimeOut = { isLoading = false })
                     } else {
                         HomeScreen(modifier = Modifier.padding(innerPadding))
                     }
-
-                    Greeting(
-                        name = "VixLegen",
-                        modifier = Modifier.padding(innerPadding)
-                    )
                 }
             }
         }
