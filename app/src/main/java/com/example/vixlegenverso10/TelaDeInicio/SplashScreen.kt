@@ -8,7 +8,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.vixlegenverso10.ui.theme.VixLegenVersão10Theme
 import kotlinx.coroutines.delay
 
 @Composable
@@ -47,5 +49,14 @@ fun SplashScreen(onTimeOut: () -> Unit) {
 
             CircularProgressIndicator()
         }
+    }
+}
+
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun SplashScreenPreview() {
+    VixLegenVersão10Theme {
+        SplashScreen(onTimeOut = {})
     }
 }

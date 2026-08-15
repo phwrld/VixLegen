@@ -66,10 +66,3 @@ fun GreetingPreview() {
     }
 }
 
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun SplashScreenPreview() {
-    VixLegenVersão10Theme {
-        SplashScreen(onTimeOut = {})
-    }
-}
