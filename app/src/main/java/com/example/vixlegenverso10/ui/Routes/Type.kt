@@ -1,4 +1,4 @@
-package com.example.vixlegenverso10.ui.theme
+package com.example.vixlegenverso10.ui.Routes
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

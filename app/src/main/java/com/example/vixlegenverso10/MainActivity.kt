@@ -8,17 +8,16 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import com.example.vixlegenverso10.AreaAdvogado.AreaAdvogadoScreen
 import com.example.vixlegenverso10.TelaDeInicio.SplashScreen
-import com.example.vixlegenverso10.ui.theme.VixLegenVersão10Theme
+import com.example.vixlegenverso10.TelaDeLogin.LoginScreen
+import com.example.vixlegenverso10.ui.Routes.VixLegenVersão10Theme
+
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,43 +25,26 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             VixLegenVersão10Theme {
-                var isLoading by remember { mutableStateOf(true) }
+                var telaAtual by remember { mutableStateOf("splash") }
 
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    if (isLoading) {
-                        SplashScreen(onTimeOut = { isLoading = false })
-                    } else {
-                        HomeScreen(modifier = Modifier.padding(innerPadding))
+                    Box(modifier = Modifier.padding(innerPadding)) {
+                        when (telaAtual) {
+                            "splash" -> SplashScreen(
+                                onTimeOut = { telaAtual = "login" }
+                            )
+
+                            "login" -> LoginScreen(
+                                onLoginClick = { telaAtual = "advogado" }
+                            )
+
+                            "advogado" -> AreaAdvogadoScreen(
+                                onSairClick = { telaAtual = "login" }
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
-
-@Composable
-fun HomeScreen(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(text = "Tela Inicial do App Jurídico!")
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    VixLegenVersão10Theme {
-        Greeting("VixLegen")
-    }
-}
-

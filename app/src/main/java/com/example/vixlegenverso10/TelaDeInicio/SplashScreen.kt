@@ -1,6 +1,6 @@
 package com.example.vixlegenverso10.TelaDeInicio
 
-import android.window.SplashScreen
+import androidx.compose.foundation.background
 import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.delay
 import androidx.compose.foundation.layout.*
@@ -8,10 +8,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.vixlegenverso10.ui.theme.VixLegenVersão10Theme
-import kotlinx.coroutines.delay
+import androidx.compose.ui.unit.sp
+import com.example.vixlegenverso10.ui.Routes.BordoPrincipal
+import com.example.vixlegenverso10.ui.Routes.FonteSerifadaVix
+import com.example.vixlegenverso10.ui.Routes.FundoBranco
+import com.example.vixlegenverso10.ui.Routes.VixLegenVersão10Theme
 
 @Composable
 fun SplashScreen(onTimeOut: () -> Unit) {
@@ -23,7 +27,8 @@ fun SplashScreen(onTimeOut: () -> Unit) {
 
     Box (
         modifier = Modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .background(FundoBranco),
         contentAlignment = Alignment.Center
 
     ) {
@@ -35,11 +40,17 @@ fun SplashScreen(onTimeOut: () -> Unit) {
         ) {
             Text(
                 text = "Vix Legen",
-                style = MaterialTheme.typography.bodyMedium
+                fontSize = 42.sp,
+                style = MaterialTheme.typography.bodyMedium,
+                fontFamily = FonteSerifadaVix,
+                fontWeight = FontWeight.Bold,
+                color = BordoPrincipal
 
             )
             Text(
                 text = "O Direito de forma simples",
+                fontSize = 16.sp,
+                fontFamily = FonteSerifadaVix,
                 style = MaterialTheme.typography.bodySmall
             )
 
@@ -47,7 +58,10 @@ fun SplashScreen(onTimeOut: () -> Unit) {
                 modifier = Modifier.height(24.dp)
             )
 
-            CircularProgressIndicator()
+            CircularProgressIndicator(
+                color = BordoPrincipal,
+                strokeWidth = 3.dp
+            )
         }
     }
 }

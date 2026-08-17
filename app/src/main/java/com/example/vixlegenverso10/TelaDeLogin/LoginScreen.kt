@@ -17,11 +17,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vixlegenverso10.R
-import com.example.vixlegenverso10.ui.theme.BordoEscuro
-import com.example.vixlegenverso10.ui.theme.BordoPrincipal
-import com.example.vixlegenverso10.ui.theme.FonteSerifadaVix
-import com.example.vixlegenverso10.ui.theme.FundoBranco
-import com.example.vixlegenverso10.ui.theme.VixLegenVersão10Theme
+import com.example.vixlegenverso10.ui.Routes.BordoEscuro
+import com.example.vixlegenverso10.ui.Routes.BordoPrincipal
+import com.example.vixlegenverso10.ui.Routes.FonteSerifadaVix
+import com.example.vixlegenverso10.ui.Routes.FundoBranco
+import com.example.vixlegenverso10.ui.Routes.VixLegenVersão10Theme
 
 @Composable
 fun LoginScreen(onLoginClick: () -> Unit) {
@@ -136,5 +136,13 @@ fun LoginScreen(onLoginClick: () -> Unit) {
                 )
             }
         }
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+fun LoginScreenPreview() {
+    VixLegenVersão10Theme {
+        LoginScreen(onLoginClick = {})
     }
 }
