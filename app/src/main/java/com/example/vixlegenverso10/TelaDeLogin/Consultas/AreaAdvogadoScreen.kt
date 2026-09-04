@@ -11,6 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -19,8 +20,8 @@ import com.example.vixlegenverso10.ui.Routes.BordoPrincipal
 import com.example.vixlegenverso10.ui.Routes.FonteSerifadaVix
 import com.example.vixlegenverso10.ui.Routes.FundoBranco
 import com.example.vixlegenverso10.ui.Routes.VixLegenVersão10Theme
+import java.text.Normalizer
 
-// Modelo de dados simples para a lista
 data class Processo(
     val numero: String,
     val cliente: String,
@@ -28,17 +29,43 @@ data class Processo(
     val ultimaAtualizacao: String
 )
 
+
+fun String.removerAcentos(): String {
+    val unaccented = Normalizer.normalize(this, Normalizer.Form.NFD)
+    return Regex("\\p{InCombiningDiacriticalMarks}+").replace(unaccented, "")
+}
+
 @Composable
 fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
     var busca by remember { mutableStateOf("") }
 
-    // Dados fictícios para demonstração no TCC
+    // Dados fictícios do app
     val listaProcessos = remember {
         listOf(
             Processo("0001234-88.2026.8.08.0001", "João Silva", "Andamento Normal", "Hoje às 10:30"),
             Processo("0009876-11.2025.8.08.0001", "Maria Oliveira", "Petição Juntada", "Ontem"),
             Processo("0004567-33.2026.8.08.0001", "Tech Soluções LTDA", "Aguardando Despacho", "12/08/2026")
         )
+    }
+
+    // Lógica de Filtragem da Busca
+    val processosFiltrados = remember(busca, listaProcessos) {
+        if (busca.isBlank()) {
+            listaProcessos
+        } else {
+            val buscaLimpa = busca.trim().removerAcentos().lowercase()
+            val buscaApenasNumeros = busca.filter { it.isDigit() }
+
+            listaProcessos.filter { processo ->
+                val clienteLimpo = processo.cliente.removerAcentos().lowercase()
+                val numeroApenasNumeros = processo.numero.filter { it.isDigit() }
+
+
+                clienteLimpo.contains(buscaLimpa) ||
+                        processo.numero.lowercase().contains(buscaLimpa) ||
+                        (buscaApenasNumeros.isNotEmpty() && numeroApenasNumeros.contains(buscaApenasNumeros))
+            }
+        }
     }
 
     Column(
@@ -72,7 +99,6 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-
                 Text(
                     text = "📱 Consulta rápida de processos",
                     fontSize = 13.sp,
@@ -81,13 +107,13 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
             }
         }
 
-        // Conteúdo Principal do vix
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // Campo de busca
+
             OutlinedTextField(
                 value = busca,
                 onValueChange = { busca = it },
@@ -100,7 +126,7 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Meus Processos",
+                text = "Meus Processos (${processosFiltrados.size})",
                 fontSize = 18.sp,
                 fontFamily = FonteSerifadaVix,
                 fontWeight = FontWeight.Bold,
@@ -109,13 +135,30 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-           //Lista
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                modifier = Modifier.fillMaxSize()
-            ) {
-                items(listaProcessos) { processo ->
-                    CardProcessoItem(processo)
+
+            if (processosFiltrados.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 40.dp),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    Text(
+                        text = "Nenhum processo encontrado para \"$busca\"",
+                        color = Color.Gray,
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            } else {
+
+                LazyColumn(
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    items(processosFiltrados) { processo ->
+                        CardProcessoItem(processo)
+                    }
                 }
             }
         }
