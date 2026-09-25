@@ -12,23 +12,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.vixlegenverso10.network.ProcessoJuridico
+import com.example.vixlegenverso10.network.RetrofitClient
 import com.example.vixlegenverso10.ui.Routes.BordoEscuro
 import com.example.vixlegenverso10.ui.Routes.BordoPrincipal
 import com.example.vixlegenverso10.ui.Routes.FonteSerifadaVix
 import com.example.vixlegenverso10.ui.Routes.FundoBranco
-import com.example.vixlegenverso10.ui.Routes.VixLegenVersão10Theme
 import java.text.Normalizer
-
-data class Processo(
-    val numero: String,
-    val cliente: String,
-    val status: String,
-    val ultimaAtualizacao: String
-)
-
 
 fun String.removerAcentos(): String {
     val unaccented = Normalizer.normalize(this, Normalizer.Form.NFD)
@@ -38,17 +30,22 @@ fun String.removerAcentos(): String {
 @Composable
 fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
     var busca by remember { mutableStateOf("") }
+    var listaProcessos by remember { mutableStateOf<List<ProcessoJuridico>>(emptyList()) }
+    var carregando by remember { mutableStateOf(true) }
 
-    // Dados fictícios do app
-    val listaProcessos = remember {
-        listOf(
-            Processo("0001234-88.2026.8.08.0001", "João Silva", "Andamento Normal", "Hoje às 10:30"),
-            Processo("0009876-11.2025.8.08.0001", "Maria Oliveira", "Petição Juntada", "Ontem"),
-            Processo("0004567-33.2026.8.08.0001", "Tech Soluções LTDA", "Aguardando Despacho", "12/08/2026")
-        )
+    // Busca os dados cadastrados no MySQL via API
+    LaunchedEffect(Unit) {
+        try {
+            listaProcessos = RetrofitClient.instance.getProcessos()
+        } catch (e: Exception) {
+            // Se não houver banco ativo ou processos vinculados, lista vazia
+            listaProcessos = emptyList()
+        } finally {
+            carregando = false
+        }
     }
 
-    // Lógica de Filtragem da Busca
+    // Filtragem em tempo real da busca
     val processosFiltrados = remember(busca, listaProcessos) {
         if (busca.isBlank()) {
             listaProcessos
@@ -57,12 +54,11 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
             val buscaApenasNumeros = busca.filter { it.isDigit() }
 
             listaProcessos.filter { processo ->
-                val clienteLimpo = processo.cliente.removerAcentos().lowercase()
-                val numeroApenasNumeros = processo.numero.filter { it.isDigit() }
-
+                val clienteLimpo = (processo.clienteNome ?: "").removerAcentos().lowercase()
+                val numeroApenasNumeros = processo.numeroProcesso.filter { it.isDigit() }
 
                 clienteLimpo.contains(buscaLimpa) ||
-                        processo.numero.lowercase().contains(buscaLimpa) ||
+                        processo.numeroProcesso.lowercase().contains(buscaLimpa) ||
                         (buscaApenasNumeros.isNotEmpty() && numeroApenasNumeros.contains(buscaApenasNumeros))
             }
         }
@@ -73,7 +69,7 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
             .fillMaxSize()
             .background(FundoBranco)
     ) {
-        // Cabeçalho da Área do Advogado
+        // Cabeçalho da área restrita
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -107,13 +103,11 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
             }
         }
 
-
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-
             OutlinedTextField(
                 value = busca,
                 onValueChange = { busca = it },
@@ -135,23 +129,34 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-
-            if (processosFiltrados.isEmpty()) {
+            if (carregando) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(top = 40.dp),
                     contentAlignment = Alignment.TopCenter
                 ) {
+                    CircularProgressIndicator(color = BordoPrincipal)
+                }
+            } else if (processosFiltrados.isEmpty()) {
+                // Tela sem processos cadastrados
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 60.dp),
+                    contentAlignment = Alignment.TopCenter
+                ) {
                     Text(
-                        text = "Nenhum processo encontrado para \"$busca\"",
+                        text = if (busca.isNotBlank())
+                            "Nenhum processo encontrado para \"$busca\"."
+                        else
+                            "Nenhum processo vinculado a esta conta.",
                         color = Color.Gray,
                         fontSize = 14.sp,
                         textAlign = TextAlign.Center
                     )
                 }
             } else {
-
                 LazyColumn(
                     verticalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier.fillMaxSize()
@@ -166,7 +171,7 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
 }
 
 @Composable
-fun CardProcessoItem(processo: Processo) {
+fun CardProcessoItem(processo: ProcessoJuridico) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
@@ -175,41 +180,38 @@ fun CardProcessoItem(processo: Processo) {
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
             Text(
-                text = processo.numero,
+                text = processo.numeroProcesso,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = BordoPrincipal
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Cliente: ${processo.cliente}",
+                text = "Cliente: ${processo.clienteNome ?: "Não informado"}",
                 fontSize = 14.sp,
                 color = Color.Black
             )
+
+            if (!processo.vara.isNullOrEmpty() || !processo.comarca.isNullOrEmpty()) {
+                Spacer(modifier = Modifier.height(2.dp))
+                Text(
+                    text = "${processo.vara ?: ""} - ${processo.comarca ?: ""}",
+                    fontSize = 12.sp,
+                    color = Color.DarkGray
+                )
+            }
+
             Spacer(modifier = Modifier.height(6.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Status: ${processo.status}",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
-                Text(
-                    text = processo.ultimaAtualizacao,
+                    text = "Status: ${processo.status ?: "Em andamento"}",
                     fontSize = 12.sp,
                     color = Color.Gray
                 )
             }
         }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun AreaAdvogadoScreenPreview() {
-    VixLegenVersão10Theme {
-        AreaAdvogadoScreen(onSairClick = {})
     }
 }

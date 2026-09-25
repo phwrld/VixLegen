@@ -14,10 +14,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.example.vixlegenverso10.AreaAdvogado.AreaAdvogadoScreen
+
+// IMPORTS CORRIGIDOS DAS TELAS
 import com.example.vixlegenverso10.TelaDeInicio.SplashScreen
 import com.example.vixlegenverso10.TelaDeLogin.LoginScreen
-import com.example.vixlegenverso10.ui.Routes.VixLegenVersão10Theme
 
+
+import com.example.vixlegenverso10.ui.Routes.VixLegenVersão10Theme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,7 +38,7 @@ class MainActivity : ComponentActivity() {
                             )
 
                             "login" -> LoginScreen(
-                                onLoginClick = { telaAtual = "advogado" }
+                                onLoginSucesso = { telaAtual = "advogado" }
                             )
 
                             "advogado" -> AreaAdvogadoScreen(

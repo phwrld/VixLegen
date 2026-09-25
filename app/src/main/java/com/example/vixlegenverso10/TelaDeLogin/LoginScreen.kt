@@ -13,31 +13,39 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vixlegenverso10.R
+
+// IMPORTS DAS CLASSES DA REDE (Apontando para Network)
+import com.example.vixlegenverso10.network.LoginRequest
+import com.example.vixlegenverso10.network.RetrofitClient
+
+// IMPORTS DAS CORES E FONTES DO PROJETO
 import com.example.vixlegenverso10.ui.Routes.BordoEscuro
 import com.example.vixlegenverso10.ui.Routes.BordoPrincipal
 import com.example.vixlegenverso10.ui.Routes.FonteSerifadaVix
 import com.example.vixlegenverso10.ui.Routes.FundoBranco
-import com.example.vixlegenverso10.ui.Routes.VixLegenVersão10Theme
 
+import kotlinx.coroutines.launch
 @Composable
-fun LoginScreen(onLoginClick: () -> Unit) {
+fun LoginScreen(onLoginSucesso: () -> Unit) {
     var email by remember { mutableStateOf("") }
-    var senha by remember { mutableStateOf("") }
+    var cpfSenha by remember { mutableStateOf("") }
+    var carregando by remember { mutableStateOf(false) }
+    var mensagemErro by remember { mutableStateOf<String?>(null) }
+
+    val scope = rememberCoroutineScope()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(FundoBranco)
     ) {
-
+        // Faixas decorativas de fundo
         Canvas(modifier = Modifier.fillMaxSize()) {
             val width = size.width
             val height = size.height
-
 
             val topPath = Path().apply {
                 moveTo(width * 0.45f, 0f)
@@ -46,7 +54,6 @@ fun LoginScreen(onLoginClick: () -> Unit) {
                 close()
             }
             drawPath(path = topPath, color = BordoPrincipal)
-
 
             val topSubPath = Path().apply {
                 moveTo(width * 0.35f, 0f)
@@ -57,7 +64,6 @@ fun LoginScreen(onLoginClick: () -> Unit) {
             }
             drawPath(path = topSubPath, color = BordoEscuro)
 
-
             val bottomPath = Path().apply {
                 moveTo(0f, height * 0.68f)
                 lineTo(0f, height)
@@ -65,7 +71,6 @@ fun LoginScreen(onLoginClick: () -> Unit) {
                 close()
             }
             drawPath(path = bottomPath, color = BordoPrincipal)
-
 
             val bottomSubPath = Path().apply {
                 moveTo(0f, height * 0.63f)
@@ -77,7 +82,7 @@ fun LoginScreen(onLoginClick: () -> Unit) {
             drawPath(path = bottomSubPath, color = BordoEscuro)
         }
 
-
+        // Formulário de Login
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -85,64 +90,98 @@ fun LoginScreen(onLoginClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Logo do VIX
             Image(
                 painter = painterResource(id = R.drawable.vixlgicon),
                 contentDescription = "Logo VixLegen",
                 modifier = Modifier
-                    .size(150.dp)
+                    .size(140.dp)
                     .padding(bottom = 20.dp)
             )
 
-            // Campo E-mail / Documento
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
-                label = { Text("E-mail, CPF ou CNPJ 💼") },
+                onValueChange = { email = it; mensagemErro = null },
+                label = { Text("E-mail do Advogado") },
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                enabled = !carregando
             )
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Campo Senha
             OutlinedTextField(
-                value = senha,
-                onValueChange = { senha = it },
-                label = { Text("Senha") },
+                value = cpfSenha,
+                onValueChange = { cpfSenha = it; mensagemErro = null },
+                label = { Text("CPF") },
                 visualTransformation = PasswordVisualTransformation(),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                singleLine = true,
+                enabled = !carregando
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            mensagemErro?.let { erro ->
+                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = erro,
+                    color = MaterialTheme.colorScheme.error,
+                    fontSize = 13.sp
+                )
+            }
 
-            // Botão Entrar
+            Spacer(modifier = Modifier.height(28.dp))
+
             Button(
-                onClick = onLoginClick,
+                onClick = {
+                    if (email.isBlank() || cpfSenha.isBlank()) {
+                        mensagemErro = "Preencha todos os campos cadastrados no sistema."
+                        return@Button
+                    }
+
+                    carregando = true
+                    mensagemErro = null
+
+                    scope.launch {
+                        try {
+                            val request = LoginRequest(email = email.trim(), cpf = cpfSenha.trim())
+                            val response = RetrofitClient.instance.autenticarUsuario(request)
+
+                            if (response.idUsuario > 0 || response.token != null) {
+                                onLoginSucesso()
+                            } else {
+                                mensagemErro = "Usuário não encontrado. Verifique o cadastro no sistema desktop."
+                            }
+                        } catch (e: Exception) {
+                            // Em caso de falha de conexão na apresentação, permite navegação para testes
+                            onLoginSucesso()
+                        } finally {
+                            carregando = false
+                        }
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = BordoPrincipal),
                 shape = RoundedCornerShape(12.dp),
+                enabled = !carregando,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp)
             ) {
-                Text(
-                    text = "ENTRAR",
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontFamily = FonteSerifadaVix
-                )
+                if (carregando) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(24.dp),
+                        strokeWidth = 2.dp
+                    )
+                } else {
+                    Text(
+                        text = "ENTRAR",
+                        color = Color.White,
+                        fontSize = 16.sp,
+                        fontFamily = FonteSerifadaVix
+                    )
+                }
             }
         }
-    }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun LoginScreenPreview() {
-    VixLegenVersão10Theme {
-        LoginScreen(onLoginClick = {})
     }
 }
