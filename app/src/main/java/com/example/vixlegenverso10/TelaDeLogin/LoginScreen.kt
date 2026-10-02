@@ -12,12 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vixlegenverso10.R
 
-// IMPORTS DAS CLASSES DA REDE (Apontando para Network)
+// IMPORTS DAS CLASSES DA REDE
 import com.example.vixlegenverso10.network.LoginRequest
 import com.example.vixlegenverso10.network.RetrofitClient
 
@@ -28,6 +27,7 @@ import com.example.vixlegenverso10.ui.Routes.FonteSerifadaVix
 import com.example.vixlegenverso10.ui.Routes.FundoBranco
 
 import kotlinx.coroutines.launch
+
 @Composable
 fun LoginScreen(onLoginSucesso: () -> Unit) {
     var email by remember { mutableStateOf("") }
@@ -114,8 +114,7 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
                 value = cpfSenha,
                 onValueChange = { cpfSenha = it; mensagemErro = null },
                 label = { Text("CPF") },
-                visualTransformation = PasswordVisualTransformation(),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(12.dp), // Removido o PasswordVisualTransformation
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 enabled = !carregando
@@ -144,17 +143,22 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
 
                     scope.launch {
                         try {
-                            val request = LoginRequest(email = email.trim(), cpf = cpfSenha.trim())
+                            // Limpa pontuações do CPF para evitar incompatibilidade com a consulta
+                            val cpfLimpo = cpfSenha.replace(".", "").replace("-", "").trim()
+                            val request = LoginRequest(
+                                email = email.trim(),
+                                cpf = cpfLimpo
+                            )
+
                             val response = RetrofitClient.instance.autenticarUsuario(request)
 
                             if (response.idUsuario > 0 || response.token != null) {
                                 onLoginSucesso()
                             } else {
-                                mensagemErro = "Usuário não encontrado. Verifique o cadastro no sistema desktop."
+                                mensagemErro = "E-mail ou CPF incorretos."
                             }
                         } catch (e: Exception) {
-                            // Em caso de falha de conexão na apresentação, permite navegação para testes
-                            onLoginSucesso()
+                            mensagemErro = "Acesso negado: E-mail/CPF incorretos ou erro de conexão com o servidor."
                         } finally {
                             carregando = false
                         }

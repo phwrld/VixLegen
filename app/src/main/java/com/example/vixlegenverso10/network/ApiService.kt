@@ -49,7 +49,8 @@ data class MovimentacaoProcessual(
 
 interface ApiService {
 
-    @POST("usuarios/autenticar")
+    // Aponta diretamente para o teu script PHP no Laragon
+    @POST("login.php")
     suspend fun autenticarUsuario(@Body loginRequest: LoginRequest): LoginResponse
 
     @GET("processos")
@@ -67,7 +68,8 @@ interface ApiService {
 // ============================================================================
 
 object RetrofitClient {
-    private const val BASE_URL = "http://10.0.2.2:3000/api/"
+    // 10.0.2.2 é o IP do emulador para aceder ao Laragon no teu PC
+    private const val BASE_URL = "http://10.0.2.2/vixlegen_api/"
 
     val instance: ApiService by lazy {
         Retrofit.Builder()
