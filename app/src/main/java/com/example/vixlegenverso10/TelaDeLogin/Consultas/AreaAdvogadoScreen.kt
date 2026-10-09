@@ -1,6 +1,7 @@
 package com.example.vixlegenverso10.AreaAdvogado
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vixlegenverso10.network.ProcessoJuridico
@@ -64,106 +66,133 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
         }
     }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(FundoBranco)
-    ) {
-        // Cabeçalho da área restrita
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(BordoPrincipal)
-                .padding(20.dp)
+    Column(modifier = Modifier.fillMaxSize().background(FundoBranco)) {
+        Column(
+            modifier = Modifier.fillMaxWidth().background(BordoPrincipal)
+                .padding(horizontal = 24.dp, vertical = 26.dp)
         ) {
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Área do Advogado",
-                        fontSize = 22.sp,
+                        "PAINEL JURÍDICO",
+                        style = MaterialTheme.typography.labelSmall,
+                        fontWeight = FontWeight.SemiBold,
+                        letterSpacing = 2.sp,
+                        color = Color.White.copy(alpha = 0.82f)
+                    )
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        "Área do Advogado",
                         fontFamily = FonteSerifadaVix,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 27.sp,
                         color = Color.White
                     )
-                    TextButton(onClick = onSairClick) {
-                        Text("Sair", color = Color.White.copy(alpha = 0.8f))
-                    }
                 }
-
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Text(
-                    text = "📱 Consulta rápida de processos",
-                    fontSize = 13.sp,
-                    color = Color.White.copy(alpha = 0.8f)
-                )
+                TextButton(onClick = onSairClick) {
+                    Text("Sair", fontWeight = FontWeight.SemiBold, color = Color.White)
+                }
             }
+            Spacer(Modifier.height(10.dp))
+            Text(
+                "Consulte e acompanhe seus processos em um só lugar.",
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White.copy(alpha = 0.88f)
+            )
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            OutlinedTextField(
-                value = busca,
-                onValueChange = { busca = it },
-                label = { Text("Buscar por nº do processo ou cliente") },
-                shape = RoundedCornerShape(12.dp),
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
+        Column(modifier = Modifier.fillMaxSize().padding(horizontal = 20.dp, vertical = 22.dp)) {
             Text(
-                text = "Meus Processos (${processosFiltrados.size})",
-                fontSize = 18.sp,
-                fontFamily = FonteSerifadaVix,
+                "Consultar processos",
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = BordoEscuro
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
+            Spacer(Modifier.height(5.dp))
+            Text(
+                "Encontre um processo pelo número ou nome do cliente.",
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.DarkGray
+            )
+            Spacer(Modifier.height(16.dp))
+            OutlinedTextField(
+                value = busca,
+                onValueChange = { busca = it },
+                label = { Text("Número do processo ou cliente") },
+                placeholder = { Text("Digite para buscar") },
+                shape = RoundedCornerShape(14.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = BordoPrincipal,
+                    focusedLabelColor = BordoPrincipal,
+                    cursorColor = BordoPrincipal,
+                    unfocusedBorderColor = BordoEscuro.copy(alpha = 0.45f)
+                ),
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
+            )
+            Spacer(Modifier.height(24.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    "Meus processos",
+                    fontFamily = FonteSerifadaVix,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 21.sp,
+                    color = BordoEscuro
+                )
+                Text(
+                    "${processosFiltrados.size} encontrado(s)",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = BordoPrincipal
+                )
+            }
+            Spacer(Modifier.height(14.dp))
             if (carregando) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 40.dp),
-                    contentAlignment = Alignment.TopCenter
-                ) {
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = BordoPrincipal)
                 }
             } else if (processosFiltrados.isEmpty()) {
-                // Tela sem processos cadastrados
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 60.dp),
-                    contentAlignment = Alignment.TopCenter
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.White),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
                 ) {
-                    Text(
-                        text = if (busca.isNotBlank())
-                            "Nenhum processo encontrado para \"$busca\"."
-                        else
-                            "Nenhum processo vinculado a esta conta.",
-                        color = Color.Gray,
-                        fontSize = 14.sp,
-                        textAlign = TextAlign.Center
-                    )
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(28.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            "Nenhum processo encontrado",
+                            fontWeight = FontWeight.Bold,
+                            style = MaterialTheme.typography.titleMedium,
+                            color = BordoEscuro,
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            if (busca.isNotBlank()) "Nenhum resultado para \"$busca\"."
+                            else "Nenhum processo vinculado a esta conta.",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.DarkGray,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
             } else {
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(bottom = 20.dp)
                 ) {
-                    items(processosFiltrados) { processo ->
-                        CardProcessoItem(processo)
-                    }
+                    items(processosFiltrados) { processo -> CardProcessoItem(processo) }
                 }
             }
         }
@@ -173,45 +202,50 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
 @Composable
 fun CardProcessoItem(processo: ProcessoJuridico) {
     Card(
+        modifier = Modifier.fillMaxWidth().border(
+            1.dp, BordoPrincipal.copy(alpha = 0.14f), RoundedCornerShape(16.dp)
+        ),
         colors = CardDefaults.cardColors(containerColor = Color.White),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(8.dp),
-        modifier = Modifier.fillMaxWidth()
+        shape = RoundedCornerShape(16.dp)
     ) {
-        Column(modifier = Modifier.padding(14.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
+            Text("PROCESSO", style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.Bold, letterSpacing = 1.3.sp, color = Color.Gray)
+            Spacer(Modifier.height(5.dp))
             Text(
-                text = processo.numeroProcesso,
-                fontSize = 14.sp,
+                processo.numeroProcesso,
+                style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = BordoPrincipal
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(Modifier.height(15.dp))
+            Text("CLIENTE", style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.SemiBold, color = Color.Gray)
             Text(
-                text = "Cliente: ${processo.clienteNome ?: "Não informado"}",
-                fontSize = 14.sp,
+                processo.clienteNome ?: "Não informado",
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.Medium,
                 color = Color.Black
             )
-
             if (!processo.vara.isNullOrEmpty() || !processo.comarca.isNullOrEmpty()) {
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(Modifier.height(10.dp))
                 Text(
-                    text = "${processo.vara ?: ""} - ${processo.comarca ?: ""}",
-                    fontSize = 12.sp,
+                    listOfNotNull(processo.vara?.takeIf { it.isNotBlank() },
+                        processo.comarca?.takeIf { it.isNotBlank() }).joinToString(" • "),
+                    style = MaterialTheme.typography.bodySmall,
                     color = Color.DarkGray
                 )
             }
-
-            Spacer(modifier = Modifier.height(6.dp))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = "Status: ${processo.status ?: "Em andamento"}",
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
-            }
+            Spacer(Modifier.height(15.dp))
+            HorizontalDivider(color = BordoPrincipal.copy(alpha = 0.13f))
+            Spacer(Modifier.height(12.dp))
+            Text(
+                "Status: ${processo.status ?: "Em andamento"}",
+                style = MaterialTheme.typography.labelMedium,
+                fontWeight = FontWeight.Medium,
+                color = BordoEscuro
+            )
         }
     }
 }
