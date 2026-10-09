@@ -8,6 +8,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
@@ -41,6 +48,26 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
     var mensagemErro by remember { mutableStateOf<String?>(null) }
 
     val scope = rememberCoroutineScope()
+    val focusManager = LocalFocusManager.current
+    val corCampo = Color(0xFFFFF8F9)
+    val coresCampo = OutlinedTextFieldDefaults.colors(
+        focusedTextColor = BordoEscuro,
+        unfocusedTextColor = BordoEscuro,
+        disabledTextColor = BordoEscuro.copy(alpha = 0.6f),
+        focusedContainerColor = corCampo,
+        unfocusedContainerColor = corCampo,
+        disabledContainerColor = corCampo,
+        errorContainerColor = corCampo,
+        focusedBorderColor = BordoPrincipal,
+        unfocusedBorderColor = BordoPrincipal.copy(alpha = 0.35f),
+        focusedLabelColor = BordoPrincipal,
+        unfocusedLabelColor = BordoEscuro.copy(alpha = 0.7f),
+        focusedPlaceholderColor = BordoEscuro.copy(alpha = 0.5f),
+        unfocusedPlaceholderColor = BordoEscuro.copy(alpha = 0.5f),
+        cursorColor = BordoPrincipal,
+        focusedLeadingIconColor = BordoPrincipal,
+        unfocusedLeadingIconColor = BordoEscuro.copy(alpha = 0.7f)
+    )
 
     Box(
         modifier = Modifier
@@ -92,7 +119,8 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp, vertical = 32.dp),
+                .imePadding()
+                .padding(horizontal = 22.dp, vertical = 28.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -104,20 +132,23 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
                     .padding(bottom = 8.dp)
             )
 
-            Text("Bem-vindo ao VixLegen", fontSize = 27.sp, fontFamily = FonteSerifadaVix, fontWeight = FontWeight.Bold, color = BordoEscuro)
+            Text("Bem-vindo ao VixLegen", fontSize = 26.sp, fontFamily = FonteSerifadaVix, fontWeight = FontWeight.Bold, color = BordoEscuro, textAlign = TextAlign.Center)
             Spacer(Modifier.height(6.dp))
-            Text("Acesse sua área jurídica com segurança", fontSize = 14.sp, color = BordoEscuro.copy(alpha = 0.75f))
+            Text("Seu espaço jurídico, em um só lugar.", fontSize = 14.sp, color = BordoEscuro.copy(alpha = 0.8f), textAlign = TextAlign.Center)
             Spacer(Modifier.height(28.dp))
-            Card(colors = CardDefaults.cardColors(containerColor = Color.White), shape = RoundedCornerShape(22.dp), elevation = CardDefaults.cardElevation(defaultElevation = 8.dp), modifier = Modifier.fillMaxWidth()) {
+            Card(colors = CardDefaults.cardColors(containerColor = Color.White), shape = RoundedCornerShape(22.dp), border = BorderStroke(1.dp, BordoPrincipal.copy(alpha = 0.15f)), elevation = CardDefaults.cardElevation(defaultElevation = 10.dp), modifier = Modifier.fillMaxWidth()) {
               Column(modifier = Modifier.padding(22.dp)) {
-            Text("Acessar minha conta", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = BordoEscuro)
+            Text("Acesse sua conta", fontSize = 22.sp, fontFamily = FonteSerifadaVix, fontWeight = FontWeight.Bold, color = BordoEscuro)
+            Spacer(Modifier.height(4.dp))
+            Text("Informe seus dados para continuar", fontSize = 13.sp, color = BordoEscuro.copy(alpha = 0.7f))
             Spacer(Modifier.height(18.dp))
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it; mensagemErro = null },
                 label = { Text("E-mail do advogado") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BordoPrincipal, focusedLabelColor = BordoPrincipal, cursorColor = BordoPrincipal),
+                placeholder = { Text("nome@exemplo.com") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
+                colors = coresCampo,
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -130,8 +161,10 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
                 value = cpfSenha,
                 onValueChange = { cpfSenha = it; mensagemErro = null },
                 label = { Text("CPF") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BordoPrincipal, focusedLabelColor = BordoPrincipal, cursorColor = BordoPrincipal),
+                placeholder = { Text("000.000.000-00") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
+                colors = coresCampo,
                 shape = RoundedCornerShape(12.dp), // Removido o PasswordVisualTransformation
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -156,6 +189,7 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
                         return@Button
                     }
 
+                    focusManager.clearFocus()
                     carregando = true
                     mensagemErro = null
 
@@ -207,6 +241,8 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
             }
               }
             }
+            Spacer(Modifier.height(18.dp))
+            Text("VixLegen  •  Acesso seguro", color = BordoEscuro.copy(alpha = 0.7f), fontSize = 12.sp, textAlign = TextAlign.Center)
         }
     }
 }
