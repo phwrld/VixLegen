@@ -1,6 +1,9 @@
 package com.example.vixlegenverso10.AreaAdvogado
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
+import androidx.compose.ui.res.painterResource
+import com.example.vixlegenverso10.R
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -34,6 +37,8 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
     var busca by remember { mutableStateOf("") }
     var listaProcessos by remember { mutableStateOf<List<ProcessoJuridico>>(emptyList()) }
     var carregando by remember { mutableStateOf(true) }
+    var confirmarSaida by remember { mutableStateOf(false) }
+    val pretoLegivel = Color(0xFF1C1C1C)
 
     // Busca os dados cadastrados no MySQL via API
     LaunchedEffect(Unit) {
@@ -66,6 +71,22 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
         }
     }
 
+    if (confirmarSaida) {
+        AlertDialog(
+            onDismissRequest = { confirmarSaida = false },
+            title = { Text("Encerrar sessão?", color = BordoEscuro, fontWeight = FontWeight.Bold) },
+            text = { Text("Deseja sair da sua área jurídica? Você poderá entrar novamente quando quiser.", color = Color(0xFF1C1C1C)) },
+            confirmButton = {
+                Button(onClick = { confirmarSaida = false; onSairClick() }, colors = ButtonDefaults.buttonColors(containerColor = BordoPrincipal)) {
+                    Text("Sim, sair", color = Color.White)
+                }
+            },
+            dismissButton = { TextButton(onClick = { confirmarSaida = false }) { Text("Continuar aqui", color = BordoEscuro) } },
+            containerColor = Color.White,
+            shape = RoundedCornerShape(20.dp)
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -81,28 +102,32 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
             Column {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    Text(
-                        text = "Área do Advogado",
-                        fontSize = 25.sp,
-                        fontFamily = FonteSerifadaVix,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                    TextButton(onClick = onSairClick) {
-                        Text("Sair", color = Color.White.copy(alpha = 0.8f))
+                    Surface(shape = RoundedCornerShape(16.dp), color = Color.White) {
+                        Image(
+                            painter = painterResource(id = R.drawable.vixlgicon),
+                            contentDescription = "Logo VixLegen",
+                            modifier = Modifier.size(62.dp).padding(6.dp)
+                        )
                     }
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("VIX LEGEN", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.4.sp)
+                        Spacer(Modifier.height(3.dp))
+                        Text("Área do Advogado", color = Color.White, fontSize = 22.sp, fontFamily = FonteSerifadaVix, fontWeight = FontWeight.Bold)
+                    }
+                    OutlinedButton(
+                        onClick = { confirmarSaida = true },
+                        border = BorderStroke(1.dp, Color.White),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)
+                    ) { Text("Sair", color = Color.White, fontWeight = FontWeight.Bold) }
                 }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Text(
-                    text = "Gestão e consulta de processos jurídicos",
-                    fontSize = 13.sp,
-                    color = Color.White.copy(alpha = 0.8f)
-                )
+                Spacer(Modifier.height(14.dp))
+                Text("Seu painel jurídico", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
+                Spacer(Modifier.height(4.dp))
+                Text("Acompanhe seus processos com clareza e organização.", color = Color.White, fontSize = 13.sp)
             }
         }
 
@@ -111,12 +136,28 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
                 .fillMaxSize()
                 .padding(20.dp)
         ) {
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(18.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White),
+                border = BorderStroke(1.dp, BordoPrincipal.copy(alpha = 0.22f)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+            ) {
+                Column(Modifier.padding(18.dp)) {
+                    Text("Visão geral", fontSize = 13.sp, color = pretoLegivel, fontWeight = FontWeight.Medium)
+                    Spacer(Modifier.height(6.dp))
+                    Text("${listaProcessos.size} processos cadastrados", fontSize = 21.sp, fontWeight = FontWeight.Bold, color = BordoEscuro)
+                    Spacer(Modifier.height(3.dp))
+                    Text("Consulte e encontre seus registros abaixo.", fontSize = 13.sp, color = pretoLegivel)
+                }
+            }
+            Spacer(Modifier.height(20.dp))
             OutlinedTextField(
                 value = busca,
                 onValueChange = { busca = it },
-                label = { Text("Número do processo ou nome do cliente") },
-                placeholder = { Text("Pesquise seus processos") },
-                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BordoPrincipal, focusedLabelColor = BordoPrincipal, cursorColor = BordoPrincipal),
+                label = { Text("Número do processo ou cliente", color = pretoLegivel) },
+                placeholder = { Text("Buscar processos...", color = pretoLegivel) },
+                colors = OutlinedTextFieldDefaults.colors(focusedTextColor = pretoLegivel, unfocusedTextColor = pretoLegivel, focusedContainerColor = Color.White, unfocusedContainerColor = Color.White, focusedBorderColor = BordoPrincipal, unfocusedBorderColor = BordoPrincipal, focusedLabelColor = pretoLegivel, unfocusedLabelColor = pretoLegivel, focusedPlaceholderColor = pretoLegivel, unfocusedPlaceholderColor = pretoLegivel, cursorColor = BordoPrincipal),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
@@ -144,22 +185,46 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
                     CircularProgressIndicator(color = BordoPrincipal)
                 }
             } else if (processosFiltrados.isEmpty()) {
-                // Tela sem processos cadastrados
                 Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 60.dp),
+                    modifier = Modifier.fillMaxSize().padding(top = 20.dp),
                     contentAlignment = Alignment.TopCenter
                 ) {
-                    Text(
-                        text = if (busca.isNotBlank())
-                            "Nenhum processo encontrado para \"$busca\"."
-                        else
-                            "Nenhum processo vinculado a esta conta.",
-                        color = Color.Gray,
-                        fontSize = 14.sp,
-                        textAlign = TextAlign.Center
-                    )
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(22.dp),
+                        colors = CardDefaults.cardColors(containerColor = Color.White),
+                        border = BorderStroke(1.dp, BordoPrincipal.copy(alpha = 0.2f)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 30.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Image(
+                                painter = painterResource(id = R.drawable.vixlgicon),
+                                contentDescription = "VixLegen",
+                                modifier = Modifier.size(80.dp)
+                            )
+                            Spacer(Modifier.height(14.dp))
+                            Text(
+                                if (busca.isNotBlank()) "Nenhum resultado encontrado" else "Seu espaço de processos",
+                                fontFamily = FonteSerifadaVix,
+                                fontSize = 21.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = BordoEscuro,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                if (busca.isNotBlank()) "Tente pesquisar por outro nome ou número de processo."
+                                else "Os processos vinculados à sua conta aparecerão aqui assim que estiverem disponíveis.",
+                                color = pretoLegivel,
+                                fontSize = 14.sp,
+                                textAlign = TextAlign.Center,
+                                lineHeight = 21.sp
+                            )
+                        }
+                    }
                 }
             } else {
                 LazyColumn(
