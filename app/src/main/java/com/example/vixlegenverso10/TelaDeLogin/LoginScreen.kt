@@ -60,14 +60,17 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
         disabledContainerColor = corCampo,
         errorContainerColor = corCampo,
         focusedBorderColor = BordoPrincipal,
-        unfocusedBorderColor = BordoPrincipal.copy(alpha = 0.35f),
+        unfocusedBorderColor = BordoPrincipal,
         focusedLabelColor = pretoLegivel,
         unfocusedLabelColor = pretoLegivel,
         focusedPlaceholderColor = pretoLegivel,
         unfocusedPlaceholderColor = pretoLegivel,
         cursorColor = BordoPrincipal,
         focusedLeadingIconColor = BordoPrincipal,
-        unfocusedLeadingIconColor = BordoEscuro.copy(alpha = 0.7f)
+        unfocusedLeadingIconColor = pretoLegivel,
+        errorTextColor = pretoLegivel,
+        errorLabelColor = pretoLegivel,
+        errorPlaceholderColor = pretoLegivel
     )
 
     Box(
@@ -176,7 +179,7 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
                 Spacer(modifier = Modifier.height(10.dp))
                 Text(
                     text = erro,
-                    color = MaterialTheme.colorScheme.error,
+                    color = pretoLegivel,
                     fontSize = 13.sp
                 )
             }
