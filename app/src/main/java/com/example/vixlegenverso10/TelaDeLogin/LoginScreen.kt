@@ -50,20 +50,21 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
     val scope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val corCampo = Color(0xFFFFF8F9)
+    val pretoLegivel = Color(0xFF171717)
     val coresCampo = OutlinedTextFieldDefaults.colors(
-        focusedTextColor = BordoEscuro,
-        unfocusedTextColor = BordoEscuro,
-        disabledTextColor = BordoEscuro.copy(alpha = 0.6f),
+        focusedTextColor = pretoLegivel,
+        unfocusedTextColor = pretoLegivel,
+        disabledTextColor = pretoLegivel,
         focusedContainerColor = corCampo,
         unfocusedContainerColor = corCampo,
         disabledContainerColor = corCampo,
         errorContainerColor = corCampo,
         focusedBorderColor = BordoPrincipal,
         unfocusedBorderColor = BordoPrincipal.copy(alpha = 0.35f),
-        focusedLabelColor = BordoPrincipal,
-        unfocusedLabelColor = BordoEscuro.copy(alpha = 0.7f),
-        focusedPlaceholderColor = BordoEscuro.copy(alpha = 0.5f),
-        unfocusedPlaceholderColor = BordoEscuro.copy(alpha = 0.5f),
+        focusedLabelColor = pretoLegivel,
+        unfocusedLabelColor = pretoLegivel,
+        focusedPlaceholderColor = pretoLegivel,
+        unfocusedPlaceholderColor = pretoLegivel,
         cursorColor = BordoPrincipal,
         focusedLeadingIconColor = BordoPrincipal,
         unfocusedLeadingIconColor = BordoEscuro.copy(alpha = 0.7f)
@@ -132,21 +133,21 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
                     .padding(bottom = 8.dp)
             )
 
-            Text("Bem-vindo ao VixLegen", fontSize = 26.sp, fontFamily = FonteSerifadaVix, fontWeight = FontWeight.Bold, color = BordoEscuro, textAlign = TextAlign.Center)
+            Text("Bem-vindo ao VixLegen", fontSize = 26.sp, fontFamily = FonteSerifadaVix, fontWeight = FontWeight.Bold, color = pretoLegivel, textAlign = TextAlign.Center)
             Spacer(Modifier.height(6.dp))
-            Text("Seu espaço jurídico, em um só lugar.", fontSize = 14.sp, color = BordoEscuro.copy(alpha = 0.8f), textAlign = TextAlign.Center)
+            Text("Seu espaço jurídico, em um só lugar.", fontSize = 14.sp, color = pretoLegivel, textAlign = TextAlign.Center)
             Spacer(Modifier.height(28.dp))
             Card(colors = CardDefaults.cardColors(containerColor = Color.White), shape = RoundedCornerShape(22.dp), border = BorderStroke(1.dp, BordoPrincipal.copy(alpha = 0.15f)), elevation = CardDefaults.cardElevation(defaultElevation = 10.dp), modifier = Modifier.fillMaxWidth()) {
               Column(modifier = Modifier.padding(22.dp)) {
-            Text("Acesse sua conta", fontSize = 22.sp, fontFamily = FonteSerifadaVix, fontWeight = FontWeight.Bold, color = BordoEscuro)
+            Text("Acesse sua conta", fontSize = 22.sp, fontFamily = FonteSerifadaVix, fontWeight = FontWeight.Bold, color = pretoLegivel)
             Spacer(Modifier.height(4.dp))
-            Text("Informe seus dados para continuar", fontSize = 13.sp, color = BordoEscuro.copy(alpha = 0.7f))
+            Text("Informe seus dados para continuar", fontSize = 13.sp, color = pretoLegivel)
             Spacer(Modifier.height(18.dp))
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it; mensagemErro = null },
-                label = { Text("E-mail do advogado") },
-                placeholder = { Text("nome@exemplo.com") },
+                label = { Text("E-mail do advogado", color = pretoLegivel) },
+                placeholder = { Text("nome@exemplo.com", color = pretoLegivel) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                 colors = coresCampo,
                 shape = RoundedCornerShape(12.dp),
@@ -160,8 +161,8 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
             OutlinedTextField(
                 value = cpfSenha,
                 onValueChange = { cpfSenha = it; mensagemErro = null },
-                label = { Text("CPF") },
-                placeholder = { Text("000.000.000-00") },
+                label = { Text("CPF", color = pretoLegivel) },
+                placeholder = { Text("000.000.000-00", color = pretoLegivel) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number, imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
                 colors = coresCampo,
@@ -242,7 +243,7 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
               }
             }
             Spacer(Modifier.height(18.dp))
-            Text("VixLegen  •  Acesso seguro", color = BordoEscuro.copy(alpha = 0.7f), fontSize = 12.sp, textAlign = TextAlign.Center)
+            Text("VixLegen  •  Acesso seguro", color = pretoLegivel, fontSize = 12.sp, textAlign = TextAlign.Center)
         }
     }
 }
