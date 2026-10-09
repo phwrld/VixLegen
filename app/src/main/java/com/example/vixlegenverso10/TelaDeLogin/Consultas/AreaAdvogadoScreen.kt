@@ -1,6 +1,7 @@
 package com.example.vixlegenverso10.AreaAdvogado
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -11,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -74,7 +76,7 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(BordoPrincipal)
-                .padding(20.dp)
+                .padding(horizontal = 22.dp, vertical = 26.dp)
         ) {
             Column {
                 Row(
@@ -84,8 +86,9 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
                 ) {
                     Text(
                         text = "Área do Advogado",
-                        fontSize = 22.sp,
+                        fontSize = 25.sp,
                         fontFamily = FonteSerifadaVix,
+                        fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                     TextButton(onClick = onSairClick) {
@@ -93,10 +96,10 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
                     }
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(10.dp))
 
                 Text(
-                    text = "📱 Consulta rápida de processos",
+                    text = "Gestão e consulta de processos jurídicos",
                     fontSize = 13.sp,
                     color = Color.White.copy(alpha = 0.8f)
                 )
@@ -106,22 +109,24 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
+                .padding(20.dp)
         ) {
             OutlinedTextField(
                 value = busca,
                 onValueChange = { busca = it },
-                label = { Text("Buscar por nº do processo ou cliente") },
+                label = { Text("Número do processo ou nome do cliente") },
+                placeholder = { Text("Pesquise seus processos") },
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BordoPrincipal, focusedLabelColor = BordoPrincipal, cursorColor = BordoPrincipal),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             Text(
                 text = "Meus Processos (${processosFiltrados.size})",
-                fontSize = 18.sp,
+                fontSize = 21.sp,
                 fontFamily = FonteSerifadaVix,
                 fontWeight = FontWeight.Bold,
                 color = BordoEscuro
@@ -158,7 +163,7 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
                 }
             } else {
                 LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalArrangement = Arrangement.spacedBy(14.dp),
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(processosFiltrados) { processo ->
@@ -174,42 +179,45 @@ fun AreaAdvogadoScreen(onSairClick: () -> Unit) {
 fun CardProcessoItem(processo: ProcessoJuridico) {
     Card(
         colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(8.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        border = BorderStroke(1.dp, BordoPrincipal.copy(alpha = 0.13f)),
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth()
     ) {
-        Column(modifier = Modifier.padding(14.dp)) {
+        Column(modifier = Modifier.padding(18.dp)) {
             Text(
                 text = processo.numeroProcesso,
-                fontSize = 14.sp,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 color = BordoPrincipal
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = "Cliente: ${processo.clienteNome ?: "Não informado"}",
-                fontSize = 14.sp,
-                color = Color.Black
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium,
+                color = BordoEscuro
             )
 
             if (!processo.vara.isNullOrEmpty() || !processo.comarca.isNullOrEmpty()) {
                 Spacer(modifier = Modifier.height(2.dp))
                 Text(
                     text = "${processo.vara ?: ""} - ${processo.comarca ?: ""}",
-                    fontSize = 12.sp,
+                    fontSize = 13.sp,
                     color = Color.DarkGray
                 )
             }
 
-            Spacer(modifier = Modifier.height(6.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = "Status: ${processo.status ?: "Em andamento"}",
-                    fontSize = 12.sp,
-                    color = Color.Gray
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = BordoEscuro
                 )
             }
         }
