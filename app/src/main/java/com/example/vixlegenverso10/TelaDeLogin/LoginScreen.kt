@@ -2,6 +2,11 @@ package com.example.vixlegenverso10.TelaDeLogin
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -86,7 +91,8 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(28.dp),
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 24.dp, vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
@@ -94,14 +100,24 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
                 painter = painterResource(id = R.drawable.vixlgicon),
                 contentDescription = "Logo VixLegen",
                 modifier = Modifier
-                    .size(140.dp)
-                    .padding(bottom = 20.dp)
+                    .size(116.dp)
+                    .padding(bottom = 8.dp)
             )
 
+            Text("Bem-vindo ao VixLegen", fontSize = 27.sp, fontFamily = FonteSerifadaVix, fontWeight = FontWeight.Bold, color = BordoEscuro)
+            Spacer(Modifier.height(6.dp))
+            Text("Acesse sua área jurídica com segurança", fontSize = 14.sp, color = BordoEscuro.copy(alpha = 0.75f))
+            Spacer(Modifier.height(28.dp))
+            Card(colors = CardDefaults.cardColors(containerColor = Color.White), shape = RoundedCornerShape(22.dp), elevation = CardDefaults.cardElevation(defaultElevation = 8.dp), modifier = Modifier.fillMaxWidth()) {
+              Column(modifier = Modifier.padding(22.dp)) {
+            Text("Acessar minha conta", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = BordoEscuro)
+            Spacer(Modifier.height(18.dp))
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it; mensagemErro = null },
-                label = { Text("E-mail do Advogado") },
+                label = { Text("E-mail do advogado") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BordoPrincipal, focusedLabelColor = BordoPrincipal, cursorColor = BordoPrincipal),
                 shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -114,6 +130,8 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
                 value = cpfSenha,
                 onValueChange = { cpfSenha = it; mensagemErro = null },
                 label = { Text("CPF") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = BordoPrincipal, focusedLabelColor = BordoPrincipal, cursorColor = BordoPrincipal),
                 shape = RoundedCornerShape(12.dp), // Removido o PasswordVisualTransformation
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -169,7 +187,7 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
                 enabled = !carregando,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(52.dp)
+                    .height(56.dp)
             ) {
                 if (carregando) {
                     CircularProgressIndicator(
@@ -182,9 +200,12 @@ fun LoginScreen(onLoginSucesso: () -> Unit) {
                         text = "ENTRAR",
                         color = Color.White,
                         fontSize = 16.sp,
-                        fontFamily = FonteSerifadaVix
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = 1.sp
                     )
                 }
+            }
+              }
             }
         }
     }
